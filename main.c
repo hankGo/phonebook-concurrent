@@ -9,6 +9,17 @@
 #include <pthread.h>
 #include <sys/mman.h>
 
+//
+#include "file.c"
+#include "debug.h"
+#include <fcntl.h>
+#define ALIGN_FILE "align.txt"
+
+#ifndef THREAD_NUM
+#define THREAD_NUM 4
+#endif
+//
+
 #include IMPL
 
 #define DICT_FILE "./dictionary/words.txt"
@@ -28,33 +39,34 @@ static double diff_in_second(struct timespec t1, struct timespec t2)
 
 int main(int argc, char *argv[])
 {
+
+
+/* ---------------- file pre-process ---------------- */
 #ifndef OPT
+
     FILE *fp;
     int i = 0;
     char line[MAX_LAST_NAME_SIZE];
-#else
-    struct timespec mid;
-#endif
-    struct timespec start, end;
-    double cpu_time1, cpu_time2;
-
-#ifndef OPT
+    
     /* check file opening */
     fp = fopen(DICT_FILE, "r");
     if (!fp) {
         printf("cannot open the file\n");
         return -1;
     }
+    
 #else
-
-#include "file.c"
-#include "debug.h"
-#include <fcntl.h>
-#define ALIGN_FILE "align.txt"
-    file_align(DICT_FILE, ALIGN_FILE, MAX_LAST_NAME_SIZE);
-    int fd = open(ALIGN_FILE, O_RDONLY | O_NONBLOCK);
+    struct timespec mid;
+    file_align(DICT_FILE, ALIGN_FILE, MAX_LAST_NAME_SIZE); // align the file, method in file.c
+    int fd = open(ALIGN_FILE, O_RDONLY | O_NONBLOCK); //open method in fcntl.h, return file description, 
     off_t fs = fsize( ALIGN_FILE);
+
 #endif
+
+    struct timespec start, end;
+    double cpu_time1, cpu_time2;
+
+
 
     /* build the entry */
     entry *pHead, *e;
@@ -67,11 +79,10 @@ int main(int argc, char *argv[])
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
 
+
 #if defined(OPT)
 
-#ifndef THREAD_NUM
-#define THREAD_NUM 4
-#endif
+
 
     clock_gettime(CLOCK_REALTIME, &start);
 

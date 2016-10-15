@@ -102,23 +102,29 @@ int main(int argc, char *argv[])
     pthread_t *tid = (pthread_t *) malloc(sizeof( pthread_t) * THREAD_NUM);
     append_a **app = (append_a **) malloc(sizeof(append_a *) * THREAD_NUM);
     for (int i = 0; i < THREAD_NUM; i++)
+        // *set_append_a(char *ptr, char *eptr, int thread_id, int number_of_thread, entry *start
         app[i] = set_append_a(map + MAX_LAST_NAME_SIZE * i, map + fs, i, THREAD_NUM, entry_pool + i);
 
     clock_gettime(CLOCK_REALTIME, &mid);
+    
     for (int i = 0; i < THREAD_NUM; i++)
+        //int pthread_create( &a_thread, a_thread_attribute, (void *) &thread_func, (void *) &argument);
+        //return 0 when success
         pthread_create( &tid[i], NULL, (void *) &append, (void *) app[i]);
 
     for (int i = 0; i < THREAD_NUM; i++)
+        //wait until pthread is done
         pthread_join(tid[i], NULL);
+
 
     entry *etmp;
     pHead = pHead->pNext;
     for (int i = 0; i < THREAD_NUM; i++) {
         if (i == 0) {
-            pHead = app[i]->pHead->pNext;
+            pHead = app[i]->pHead;
             dprintf("Connect %d head string %s %p\n", i, app[i]->pHead->pNext->lastName, app[i]->ptr);
         } else {
-            etmp->pNext = app[i]->pHead->pNext;
+            etmp->pNext = app[i]->pHead;
             dprintf("Connect %d head string %s %p\n", i, app[i]->pHead->pNext->lastName, app[i]->ptr);
         }
 

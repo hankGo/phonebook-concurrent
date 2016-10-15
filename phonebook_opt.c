@@ -54,10 +54,13 @@ void append(void *arg)
     for (char *i = app->ptr; i < app->eptr;
             i += MAX_LAST_NAME_SIZE * app->nthread,
             j += app->nthread,count++) {
+        
+        //set the next linked pointer
         app->pLast->pNext = j;
+        
+        //set "the next pointer" data
         app->pLast = app->pLast->pNext;
-
-        app->pLast->lastName = i;
+        app->pLast->lastName = i;   // i (pointer in map) points to lastname  
         dprintf("thread %d append string = %s\n", app->tid, app->pLast->lastName);
         app->pLast->pNext = NULL;
     }

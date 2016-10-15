@@ -31,11 +31,11 @@ typedef struct __PHONE_BOOK_ENTRY {
 entry *findName(char lastname[], entry *pHead);
 
 typedef struct _append_a {
-    char *ptr;
-    char *eptr;
-    int tid;
-    int nthread;
-    entry *entryStart;
+    char *ptr;          // first address of certain pthread on map; map + MAX_LAST_NAME_SIZE * i
+    char *eptr;         // last address of map; map + fs
+    int tid;            // thread id ( 0, 1, 2, ...)
+    int nthread;        // number of threads
+    entry *entryStart;  // start address in entry pool
     entry *pHead;
     entry *pLast;
 } append_a;

@@ -19,6 +19,8 @@
 #define THREAD_NUM 4
 #endif
 //
+#define CHECK_FLAG 0
+#define DISPLAY_FLAG 0
 
 #include IMPL
 
@@ -60,6 +62,7 @@ int main(int argc, char *argv[])
     file_align(DICT_FILE, ALIGN_FILE, MAX_LAST_NAME_SIZE); // align the file, method in file.c
     int fd = open(ALIGN_FILE, O_RDONLY | O_NONBLOCK); //open method in fcntl.h, return file description, 
     off_t fs = fsize( ALIGN_FILE);
+    //printf("aligned file size = %d\n", fs);
 
 #endif
 
@@ -79,10 +82,9 @@ int main(int argc, char *argv[])
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
 #endif
 
+/* ---------------- append() ---------------- */
 
 #if defined(OPT)
-
-
 
     clock_gettime(CLOCK_REALTIME, &start);
 
@@ -100,7 +102,7 @@ int main(int argc, char *argv[])
     pthread_t *tid = (pthread_t *) malloc(sizeof( pthread_t) * THREAD_NUM);
     append_a **app = (append_a **) malloc(sizeof(append_a *) * THREAD_NUM);
     for (int i = 0; i < THREAD_NUM; i++)
-        app[i] = new_append_a(map + MAX_LAST_NAME_SIZE * i, map + fs, i, THREAD_NUM, entry_pool + i);
+        app[i] = set_append_a(map + MAX_LAST_NAME_SIZE * i, map + fs, i, THREAD_NUM, entry_pool + i);
 
     clock_gettime(CLOCK_REALTIME, &mid);
     for (int i = 0; i < THREAD_NUM; i++)
@@ -148,6 +150,9 @@ int main(int argc, char *argv[])
     fclose(fp);
 #endif
 
+
+/* ---------------- findname() ---------------- */
+
     e = pHead;
 
     /* the givn last name to find */
@@ -157,6 +162,9 @@ int main(int argc, char *argv[])
     assert(findName(input, e) &&
            "Did you implement findName() in " IMPL "?");
     assert(0 == strcmp(findName(input, e)->lastName, "zyxel"));
+
+
+
 
 #if defined(__GNUC__)
     __builtin___clear_cache((char *) pHead, (char *) pHead + sizeof(entry));
@@ -179,6 +187,37 @@ int main(int argc, char *argv[])
     printf("execution time of append() : %lf sec\n", cpu_time1);
     printf("execution time of findName() : %lf sec\n", cpu_time2);
 
+/* ---------------- data verification ---------------- */
+#if CHECK_FLAG==1
+    
+    FILE *fc;
+    char check_line[MAX_LAST_NAME_SIZE];
+    
+    /* check file opening */
+    fc = fopen(DICT_FILE, "r");
+    if (!fc) {
+        printf("cannot open the file to check\n");
+        return -1;
+    }
+    
+    while (fgets(check_line, sizeof(check_line), fc)) {    
+        e = pHead;
+        if(findName(check_line, e) == NULL)
+            printf("%s is no found \n",check_line);
+
+    }
+    
+    fclose(fc);
+#endif
+
+#ifdef OPT
+#if DISPLAY_FLAG==1
+    e = pHead;
+    show_entry(e);  
+#endif
+#endif
+
+
 #ifndef OPT
     if (pHead->pNext) free(pHead->pNext);
     free(pHead);
@@ -188,5 +227,9 @@ int main(int argc, char *argv[])
     free(app);
     munmap(map, fs);
 #endif
+
+
+
+/* -------------- end of main() -------------------*/
     return 0;
 }

@@ -25,7 +25,7 @@ entry *findName(char lastname[], entry *pHead)
     return NULL;
 }
 
-append_a *new_append_a(char *ptr, char *eptr, int tid, int ntd, entry *start)
+append_a *set_append_a(char *ptr, char *eptr, int tid, int ntd, entry *start)
 {
     append_a *app = (append_a *) malloc(sizeof(append_a));
 
@@ -70,12 +70,13 @@ void append(void *arg)
 }
 
 void show_entry(entry *pHead)
-{
+{  
     while (pHead != NULL) {
-        printf("lastName = %s\n", pHead->lastName);
+        printf("%s", pHead->lastName);
         pHead = pHead->pNext;
     }
 }
+
 
 static double diff_in_second(struct timespec t1, struct timespec t2)
 {

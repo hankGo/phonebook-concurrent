@@ -68,7 +68,7 @@ void append(void *arg)
     cpu_time = diff_in_second(start, end);
 
     dprintf("thread take %lf sec, count %d\n", cpu_time, count);
-
+    //printf("thread # : %d\n", app->tid);
     pthread_exit(NULL);
 }
 

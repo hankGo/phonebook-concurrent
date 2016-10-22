@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
 
     entry *etmp;
     pHead = pHead->pNext;
+    
     for (int i = 0; i < THREAD_NUM; i++) {
         if (i == 0) {
             pHead = app[i]->pHead;
